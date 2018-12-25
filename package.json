@@ -1,0 +1,25 @@
+{
+  "name": "boot_pract2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --exit",
+    "deploy": "node deploy.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "solc": "^0.4.25"
+  },
+  "dependencies": {
+    "ganache-cli": "^6.2.5",
+    "truffle-hdwallet-provider": "^0.0.3",
+    "web3": "^1.0.0-beta.37"
+  }
+}
+
