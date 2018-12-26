@@ -2,19 +2,25 @@ pragma solidity ^0.4.25;
 
 contract Campaign {
 
+    event VoteLog(address wallet, bool vote);
+
     struct Request {
         string description;
         uint amount;
         address recipient;
         bool complete;
-        mapping(address => bool) aprovals;
+        mapping(address => bool) approvals;
         uint approvalsCount;
     }
 
     address public manager;
     uint minContribution;
+    uint numApprovers;
     mapping( address => uint) approvers;
-    Request[] public requests;
+
+    //Request[] public requests;
+    uint numRequest;
+    mapping( uint => Request ) public requests;
 
     modifier restrictManager(){
         require(msg.sender == manager);
@@ -22,9 +28,16 @@ contract Campaign {
         _;
     }
 
+    modifier restrictApprover(){
+        require(approvers[msg.sender] != 0);
+
+        _;
+    }
+
     constructor () public {
         manager = msg.sender;
         minContribution = 0.5 ether;
+        numRequest = 0;
     }
 
     function contribute() public payable {
@@ -35,7 +48,7 @@ contract Campaign {
         } else{
             approvers[msg.sender] = msg.value;
         }
-
+        numApprovers++;
     }
 
     //only called by manager
@@ -47,35 +60,53 @@ contract Campaign {
             amount: _amount,
             recipient: _recipient,
             complete: false,
-            //aprovals declalarlo vacío al inicio
+            //approvals: (_recipient, false),//aprovals declalarlo vacío al inicio
             approvalsCount: 0
             });
 
+        requests[numRequest] = newRequest;
+        //requests[numRequest].approvals[_recipient] = false;
+        numRequest++;
 
-        requests.push(newRequest);
     }
 
     //accesible por los approvers
-    function approveRequest(uint _indexRequest, string _vote) public {
+    function approveRequest(uint _indexRequest, string _vote) public restrictApprover{
 
         bool vote = true;
         if(keccak256(_vote) == keccak256("no")){
             vote = false;
         }
-        requests[_indexRequest].approvalsCount++;
-        requests[_indexRequest].aprovals[msg.sender] = vote;
+
+        requests[_indexRequest].approvals[msg.sender] = vote;
+        if(vote)requests[_indexRequest].approvalsCount++;
+
+        uint possitiveVotes = numApprovers - requests[_indexRequest].approvalsCount;
+
+        if(possitiveVotes > numApprovers / 2){
+            requests[_indexRequest].complete = true;
+        }
+
+        emit VoteLog(msg.sender, vote);
     }
 
     //only called by manager
     function finalizeRequest(uint _index) public payable restrictManager {
+        require(address(this).balance >= requests[_index].amount);
 
+        if(requests[_index].complete){
 
-        requests[_index].recipient.transfer(address(this).balance);
+            requests[_index].recipient.transfer(requests[_index].amount);
+        }
+
     }
 
     function getBalance() public view returns (uint){
         return address(this).balance;
     }
 
+    function getNumRequest()public view returns (uint){
+        return numRequest;
+    }
 
 }
