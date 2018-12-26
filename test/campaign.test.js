@@ -44,4 +44,10 @@ describe('Campaign', () =>{
         console.log(request);
         assert(request);
     });
+
+    it('Has approvers', async () => {
+
+        const approvers = await campaign.methods.numApprovers().call();//para una llamada no hace falta pasar param extras
+        assert(approvers);
+    });
 });

@@ -15,7 +15,7 @@ contract Campaign {
 
     address public manager;
     uint minContribution;
-    uint numApprovers;
+    uint public numApprovers;
     mapping( address => uint) approvers;
 
     //Request[] public requests;
