@@ -1,4 +1,4 @@
-require('events').EventEmitter.defaultMaxListeners = 15;//THIS IS USED TO AVOID A NODE MAXLISTENERS ERROR!!!!!!!
+require('events').EventEmitter.defaultMaxListeners = 20;//THIS IS USED TO AVOID A NODE MAXLISTENERS ERROR!!!!!!!
 /*********************************************************************************************************/
 const assert = require('assert');
 const ganache = require('ganache-cli');//provider para BC privado. Parecido al JVM de Remix para no gastar ether
@@ -43,6 +43,14 @@ describe('Campaign', () =>{
         const request = await campaign.methods.requests(0).call();
         console.log(request);
         assert(request);
+    });
+
+    it('can contribute', async () => {
+
+        console.log("account: ", accounts[0]);
+        await campaign.methods.contribute().send({ from: accounts[0], value: "10000000" });//para una llamada no hace falta pasar param extras
+        const approvers = await campaign.methods.numApprovers().call();//para una llamada no hace falta pasar param extras
+        assert.equal(approvers, 1);
     });
 
     it('Has approvers', async () => {

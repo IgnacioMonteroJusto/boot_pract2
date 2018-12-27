@@ -92,7 +92,7 @@ contract Campaign {
 
     //only called by manager
     function finalizeRequest(uint _index) public payable restrictManager {
-        require(address(this).balance >= requests[_index].amount);
+        require(address(this).balance >= requests[_index].amount, 'Not enough founds.');
 
         if(requests[_index].complete){
 
