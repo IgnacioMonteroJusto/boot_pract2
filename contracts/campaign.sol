@@ -17,6 +17,7 @@ contract Campaign {
     uint minContribution;
     uint public numApprovers;
     mapping( address => uint) approvers;
+    mapping( address => bool) approversVoted;
 
     //Request[] public requests;
     uint numRequest;
@@ -48,6 +49,7 @@ contract Campaign {
         } else{
             approvers[msg.sender] = msg.value;
         }
+        approversVoted[msg.sender] = false;
         numApprovers++;
     }
 
@@ -73,6 +75,8 @@ contract Campaign {
     //accesible por los approvers
     function approveRequest(uint _indexRequest, string _vote) public restrictApprover{
 
+        require(approversVoted[msg.sender] == true, 'User has already voted');
+
         bool vote = true;
         if(keccak256(_vote) == keccak256("no")){
             vote = false;
@@ -87,6 +91,7 @@ contract Campaign {
             requests[_indexRequest].complete = true;
         }
 
+        approversVoted[msg.sender] = true;
         emit VoteLog(msg.sender, vote);
     }
 
