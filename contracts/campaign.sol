@@ -73,17 +73,12 @@ contract Campaign {
     }
 
     //accesible por los approvers
-    function approveRequest(uint _indexRequest, string _vote) public restrictApprover{
+    function approveRequest(uint _indexRequest, bool _vote) public restrictApprover{
 
         require(approversVoted[msg.sender] == true, 'User has already voted');
 
-        bool vote = true;
-        if(keccak256(_vote) == keccak256("no")){
-            vote = false;
-        }
-
-        requests[_indexRequest].approvals[msg.sender] = vote;
-        if(vote)requests[_indexRequest].approvalsCount++;
+        requests[_indexRequest].approvals[msg.sender] = _vote;
+        if(_vote)requests[_indexRequest].approvalsCount++;
 
         uint possitiveVotes = numApprovers - requests[_indexRequest].approvalsCount;
 
@@ -92,7 +87,7 @@ contract Campaign {
         }
 
         approversVoted[msg.sender] = true;
-        emit VoteLog(msg.sender, vote);
+        emit VoteLog(msg.sender, _vote);
     }
 
     //only called by manager
