@@ -7,21 +7,24 @@ const web3 = new Web3(ganache.provider());//instanciamos web3 que es el motor pa
 
 const aux = require('../compile');//importamos ABI y BYTECODE de campaign
 //const { interface, bytecode } = aux;
-const interfaceCampaign = aux[":Campaign"];
+
+console.log("Aux ", aux);
+
+const interfaceCampaign = aux.campaign;
 
 let accounts;//creamos variable general para tener los wallets cargados
 let inbox;
 
-console.log("Contract Compiled ", aux);
+console.log("Contract Compiled ", interfaceCampaign);
 
 beforeEach(async () => {
     //Get all accounts
     accounts = await web3.eth.getAccounts();
 
     //Use one of those account to deploy de contract
-    campaign = await new web3.eth.Contract(JSON.parse(interfaceCampaign))
+    campaign = await new web3.eth.Contract(JSON.parse(interfaceCampaign.interface))
         .deploy({
-            data: bytecode
+            data: interfaceCampaign.bytecode
             //arguments: ['Hi, there']
         })
         .send({ from: accounts[0], gas: "5000000"});//acaba en punto send porque envía una trans

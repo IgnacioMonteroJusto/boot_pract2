@@ -3,6 +3,7 @@ const Web3 = require('web3');//para trabajar con SC
 //const {interface, bytecode } = require('./compile');
 
 const contracts = require('./compile');
+console.log("contracts ", contracts);
 
 //mi cuenta
 const provider = new HDWalletProvider(
@@ -18,8 +19,8 @@ const deploy = async () => {
 
     console.log('Attempting to deploy from account ', accounts[0]);
 
-    const result = await new web3.eth.Contract(JSON.parse(contract[]))
-        .deploy({ data: bytecode, arguments: ['We are starting our Campaing!!!!']})
+    const result = await new web3.eth.Contract(JSON.parse(contracts.campaign.interface))
+        .deploy({ data: contract.campaign.bytecode, arguments: ['We are starting our Campaing!!!!']})
         .send({ gas: 5000000, from: accounts[0]});
 
     console.log('Contract deploy to ', result.options.address);
