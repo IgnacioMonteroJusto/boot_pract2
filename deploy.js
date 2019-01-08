@@ -1,6 +1,8 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');//se encarga de la conexion con la BC
 const Web3 = require('web3');//para trabajar con SC
-const {interface, bytecode } = require('./compile');
+//const {interface, bytecode } = require('./compile');
+
+const contracts = require('./compile');
 
 //mi cuenta
 const provider = new HDWalletProvider(
@@ -16,7 +18,7 @@ const deploy = async () => {
 
     console.log('Attempting to deploy from account ', accounts[0]);
 
-    const result = await new web3.eth.Contract(JSON.parse(interface))
+    const result = await new web3.eth.Contract(JSON.parse(contract[]))
         .deploy({ data: bytecode, arguments: ['We are starting our Campaing!!!!']})
         .send({ gas: 5000000, from: accounts[0]});
 

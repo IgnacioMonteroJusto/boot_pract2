@@ -6,19 +6,20 @@ const Web3 = require('web3');
 const web3 = new Web3(ganache.provider());//instanciamos web3 que es el motor para acceder a la BC
 
 const aux = require('../compile');//importamos ABI y BYTECODE de campaign
-const { interface, bytecode } = aux;
+//const { interface, bytecode } = aux;
+const interfaceCampaign = aux[":Campaign"];
 
 let accounts;//creamos variable general para tener los wallets cargados
 let inbox;
 
-//console.log("Contract Compiled ", aux);
+console.log("Contract Compiled ", aux);
 
 beforeEach(async () => {
     //Get all accounts
     accounts = await web3.eth.getAccounts();
 
     //Use one of those account to deploy de contract
-    campaign = await new web3.eth.Contract(JSON.parse(interface))
+    campaign = await new web3.eth.Contract(JSON.parse(interfaceCampaign))
         .deploy({
             data: bytecode
             //arguments: ['Hi, there']

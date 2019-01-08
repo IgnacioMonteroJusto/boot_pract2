@@ -1,5 +1,7 @@
 pragma solidity ^0.4.25;
 
+//import "./proxy.sol";
+
 contract Campaign {
 
     event VoteLog(address wallet, bool vote);
