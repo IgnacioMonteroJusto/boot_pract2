@@ -1,4 +1,6 @@
-Esto es un proyecto de prueba que simula la creacion de campañas para Kickstarter
+## Solidity practice
+
+Esto es un *proyecto de prueba* que simula la creacion de campañas para Kickstarter
 y permite a la campaña ganadora reciba el dinero solicitado tras recibir
 la mayoria de votos positivos.
 
