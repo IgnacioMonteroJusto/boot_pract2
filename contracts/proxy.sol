@@ -11,7 +11,7 @@ contract Proxy {
         return addressProxy;
     }
 
-    function setProxyAddress(address _newAddress) public restrictManager {
+    function setProxyAddress(address _newAddress) public {
         addressProxy = _newAddress;
     }
 }

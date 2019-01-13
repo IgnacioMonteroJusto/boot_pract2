@@ -1,11 +1,24 @@
 pragma solidity ^0.4.25;
 
-import "./proxy.sol";
+//import "proxy.sol";
+
+contract ERC20Interface {
+    // Send _value amount of tokens to address _to
+    function transfer(address _to, uint256 _value) public returns (bool success);
+    // Get the account balance of another account with address _owner
+    function balanceOf(address _owner) public constant returns (uint256 balance);
+}
 
 contract Campaign {
 
     event VoteLog(address wallet, bool vote);
 
+    event PaymentLog(address from, address to, uint value);
+
+    struct votedRequest{
+        address voter;
+        uint request_id;
+    }
     struct Request {
         string description;
         uint amount;
@@ -15,6 +28,10 @@ contract Campaign {
         uint approvalsCount;
     }
 
+    uint private reward = 50;
+    //ERC20Interface nachoToken = ERC20Interface(0x313300d64372c4bf94466508770D1d8195277690);
+    ERC20Interface nachoToken;
+    //address public nachoToken = 0x313300d64372c4bf94466508770D1d8195277690;//Natoken
     address public manager;
     uint minContribution;
     uint public numApprovers;
@@ -24,6 +41,7 @@ contract Campaign {
     //Request[] public requests;
     uint numRequest;
     mapping( uint => Request ) public requests;
+    votedRequest[] public voter;
 
     modifier restrictManager(){
         require(msg.sender == manager);
@@ -37,10 +55,11 @@ contract Campaign {
         _;
     }
 
-    constructor () public {
+    constructor (address _nachotoken) public {
         manager = msg.sender;
         minContribution = 0.5 ether;
         numRequest = 0;
+        nachoToken = ERC20Interface(_nachotoken);
     }
 
     function contribute() public payable {
@@ -56,8 +75,7 @@ contract Campaign {
     }
 
     //only called by manager
-    function createRequest(string _desc, uint _amount, address _recipient) public restrictManager{
-        require(msg.sender == manager);
+    function createRequest(string _desc, uint _amount, address _recipient) public {
 
         Request memory newRequest = Request({
             description: _desc,
@@ -80,7 +98,13 @@ contract Campaign {
         require(approversVoted[msg.sender] == true, 'User has already voted');
 
         requests[_indexRequest].approvals[msg.sender] = _vote;
-        if(_vote)requests[_indexRequest].approvalsCount++;
+        if(_vote){
+            requests[_indexRequest].approvalsCount++;
+            voter.push(votedRequest({
+                voter: msg.sender,
+                request_id: _indexRequest
+            }));
+        }
 
         uint possitiveVotes = numApprovers - requests[_indexRequest].approvalsCount;
 
@@ -99,8 +123,35 @@ contract Campaign {
         if(requests[_index].complete){
 
             requests[_index].recipient.transfer(requests[_index].amount);
+
+            payTokens(_index);
+            requests[_index].approvalsCount = 0;
+            delete voter;
         }
 
+    }
+
+    function payTokens(uint _indexRequest) internal  returns (bool){
+
+        //loop array and pay tokens
+        for(uint i = 0; i<= voter.length; i++){
+            if(voter[i].request_id == _indexRequest && requests[_indexRequest].approvals[voter[i].voter] == true){
+                payTokensTo(voter[i].voter);
+            }
+        }
+        return true;
+    }
+
+    function payTokensTo(address _to) internal returns (bool){
+
+        /*
+        El contrato nachoTOken tiene que tener fondos para poder transferir tokens.
+        Los tokens, se transfieren al manager a la hora de crear el contrato, con lo que
+        el manager tendría que pasar los tokens al contrato nachoTokens para que sea este quien transfiera el dinero
+        de la recompensas.
+        */
+        nachoToken.transfer(_to, reward);
+        return true;
     }
 
     function getBalance() public view returns (uint){
@@ -111,4 +162,7 @@ contract Campaign {
         return numRequest;
     }
 
+    function getTokenAddress()public view returns (address){
+        return nachoToken;
+    }
 }
