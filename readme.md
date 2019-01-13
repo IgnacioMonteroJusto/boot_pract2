@@ -13,5 +13,8 @@ En nuestro sistema de Campañas, se podría valorar la implementación de un tok
 Esto no quiere decir que la campaña más votada sea la más exitosa. Eso es otro tema a tratar en el cuál habría que definir un sistema de recompensas para repartir los tokens de la manera más fiable y equitativa posible.
 
 
+En **contracts** podemos encontrar los contratos levantados.
+En **test** encontramos los test generados para el proyecto.
+
 
 [Repo](https://github.com/IgnacioMonteroJusto/boot_pract2)
